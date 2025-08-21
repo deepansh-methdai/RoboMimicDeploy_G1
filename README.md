@@ -40,7 +40,7 @@ conda install pytorch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 pytorch-cuda=
 进入目录并安装：
 
 ```bash
-cd RoboMimic_Deploy
+cd RoboMimicDeploy_G1
 pip install numpy==1.20.0
 pip install onnx onnxruntime
 pip install hydra-core
