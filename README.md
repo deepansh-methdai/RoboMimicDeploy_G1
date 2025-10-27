@@ -1,43 +1,36 @@
-Reference article 参考文章：
->Unitree G1 真机部署链路详解
->[https://blog.csdn.net/shanpenghui/article/details/109354918](https://blog.csdn.net/shanpenghui/article/details/150577762?spm=1001.2014.3001.5502)
 
->跑通宇树G1的 sim2sim
->[https://blog.csdn.net/shanpenghui/article/details/109361766](https://blog.csdn.net/shanpenghui/article/details/150413803?spm=1001.2014.3001.5502)
 
-## 安装配置
+## Installation & Configuration
 
-## 1. 创建虚拟环境
+## 1. Create a Virtual Environment
 
-建议在虚拟环境中运行训练或部署程序，推荐使用 Conda 创建虚拟环境。
+It is recommended to run training or deployment inside a virtual environment, preferably using Conda.
 
-### 1.1 创建新环境
-
-使用以下命令创建虚拟环境：
+### 1.1 Create a New Environment
 
 ```bash
 conda create -n robomimic python=3.8
 ```
 
-### 1.2 激活虚拟环境
+### 1.2 Activate Environment
 
 ```bash
 conda activate robomimic
 ```
 
-## 2. 安装依赖
+## 2. Install Dependencies
 
-### 2.1 安装 PyTorch
+### 2.1 Install PyTorch
 
-PyTorch 是一个神经网络计算框架，用于模型训练和推理。使用以下命令安装：
+PyTorch is a deep learning framework used for model training and inference. Install using:
 
 ```bash
 conda install pytorch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 pytorch-cuda=12.1 -c pytorch -c nvidia
 ```
 
-#### 2.2.2 安装组件
+#### 2.2.2 Install Components
 
-进入目录并安装：
+Enter the project directory and install required packages:
 
 ```bash
 cd RoboMimicDeploy_G1
@@ -46,7 +39,7 @@ pip install onnx onnxruntime
 pip install hydra-core
 ```
 
-#### 2.2.3 安装unitree_sdk2_python
+#### 2.2.3 Install unitree_sdk2_python
 
 ```bash
 git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
@@ -54,121 +47,138 @@ cd unitree_sdk2_python
 pip install -e .
 ```
 
-## 运行代码
+---
 
-## 1. 运行Mujoco仿真代码
+## Run Code
 
-```bash
-python deploy_mujoco/deploy_mujoco.py
-```
-
-## 2. Policy 说明
-
-| 模式名称              | 描述                                   |
-| ----------------- | ------------------------------------ |
-| **PassiveMode**   | 阻尼保护模式                               |
-| **FixedPose**     | 位控恢复至默认关节值                           |
-| **STANDMODE**     | 从平躺状态站立                              |
-| **LocoMode**      | 用于稳定行走的控制模式                          |
-| **Dance**         | 查尔斯顿舞蹈                               |
-| **SKILL_ASAP**    | 罗纳尔多的起跳动作                            |
-| **KungFu**        | 武术动作                                 |
-| **KungFu2**       | 训练失败的武术动作                            |
-| **Kick**          | 拿来凑数的动作                              |
-| **SkillCast**     | 下肢+腰部稳定站立，上肢位控至特定关节角，一般在执行Mimic策略前执行 |
-| **SkillCooldown** | 下肢+腰部持续平衡，上肢恢复至默认关节角，一般在执行Mimic策略后执行 |
-
-## 3. 仿真操作说明
-
-1. 连接Xbox手柄
-
-2. 运行仿真程序：
+## 1. Run Mujoco Simulation Code
 
 ```bash
 python deploy_mujoco/deploy_mujoco.py
 ```
 
-如果需要机器人从平躺状态站立，进入 LocoMode ，则运行以下指令
+---
 
+## 2. Policy Description
+
+| Mode Name         | Description                                                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **PassiveMode**   | Damping protection mode                                                                                                 |
+| **FixedPose**     | Position control recovery to default joint angles                                                                       |
+| **STANDMODE**     | Stand up from lying posture                                                                                             |
+| **LocoMode**      | Walking stability control mode                                                                                          |
+| **Dance**         | Charleston dancing                                                                                                      |
+| **SKILL_ASAP**    | “Ronaldo-style” jump motion                                                                                             |
+| **KungFu**        | Martial arts motion                                                                                                     |
+| **KungFu2**       | Failed martial arts motion                                                                                              |
+| **Kick**          | Simple kicking motion                                                                                                   |
+| **SkillCast**     | Lower body + waist stable standing, upper body moves to skill-specific poses — usually executed **before** Mimic policy |
+| **SkillCooldown** | Lower body + waist balance maintenance, upper body resets — usually executed **after** Mimic policy                     |
+
+---
+
+## 3. Simulation Operation Instructions
+
+1. Connect an Xbox controller
+2. Start the simulation:
+
+```bash
+python deploy_mujoco/deploy_mujoco.py
 ```
+
+To make the robot stand up from lying posture and enter LocoMode:
+
+```bash
 python deploy_mujoco/deploy_mujoco.py xml_path=g1_description/g1_29dof_LieDown.xml
 ```
 
-3. Start键进入位控模式
+3. Press **Start** to enter position control mode
 
-4. 同时按住R1+A，进入LocoMode，并按下 `BACKSPACE`在仿真中使机器人站立，之后能通过摇杆控制机器人行走
-   (当机器人从平躺状态开始时，需要先按 L1+X 进入站立状态， 再按 R1+A 进入 LocoMode.)
+4. Hold **R1 + A** to enter **LocoMode**, press **BACKSPACE** to make robot stand up; afterwards use joysticks to walk
+   (If starting from lying posture: first press **L1 + X** to stand up → then **R1 + A** into LocoMode)
 
-5. 同时按住R1+X，进入Dance，机器人开始跳查尔斯顿舞蹈，在该模式下，可以随时按下L1进入阻尼保护模式，也可以按住R1+A恢复行走模式（不推荐），或按Start进入位控模式（不推荐）
+5. Hold **R1 + X** to enter **Dance mode**
+   (Charleston dance). Press **L1** anytime for PassiveMode. Can switch back to LocoMode or position mode but **not recommended**.
 
-6. 终端会显示舞蹈的进度条，结束后可按下R1+A恢复至正常行走模式
+6. Terminal will show progress bar; after dance ends you can press **R1 + A** to return to walking mode
 
-7. 在LocoMode模式下，按R1+Y让机器人表演武术动作，**只推荐在仿真中使用**
+7. In **LocoMode**, press **R1 + Y** for martial arts performance — **simulation only**
 
-8. 在LocoMode模式下，按L1+Y让机器人表演训练失败的武术动作，**只推荐在仿真中使用**
+8. In **LocoMode**, press **L1 + Y** for failed martial arts — **simulation only**
 
-9. 在LocoMode模式下，按R1+B让机器人表演踢腿动作，**只推荐在仿真中使用**
+9. In **LocoMode**, press **R1 + B** for kicking — **simulation only**
 
-10. 在LocoMode模式下，按 L1+A 让机器人表演ASAP跳跃动作，**只推荐在仿真中使用**
+10. In **LocoMode**, press **L1 + A** for ASAP jump — **simulation only**
 
-## 4. 真机操作说明
+---
 
-1. 开机后将机器人吊起来
+## 4. Real Robot Operation
 
-2. 运行deploy_real程序：
+1. Hang the robot first (for safety)
+2. Run real deployment program:
 
 ```bash
 python deploy_real/deploy_real.py
 ```
 
-3. Start键进入位控模式
+3. Press **Start** to enter position control mode
+4. If starting from lying posture: **L1 + X** to stand → **R1 + A** to enter walking mode
+5. Other actions are the same as simulation
 
-4. 当机器人从平躺状态开始时，需要先按 L1+X 进入站立状态， 再按 R1+A 进入 LocoMode
+---
 
-5. 其他动作操作与仿真中一致
+## Notes & Safety Reminders
 
-## 注意事项
+### 1. Framework Compatibility Notes
 
-### 1. 框架兼容性说明
+The current framework **does not support** direct deployment on **G1 robots with Orin-NX onboard computer**.
 
-当前框架暂不支持在搭载Orin NX平台的G1机器人上直接部署。初步分析可能是由于 `unitree_python_sdk`在Orin平台上的兼容性问题。针对机载Orin平台的部署需求，建议采用以下替代方案：
+Root cause suspected: compatibility issues with `unitree_python_sdk`.
 
-* 使用[unitree_sdk2](https://github.com/unitreerobotics/unitree_sdk2)替代原Python SDK
+Recommended alternative:
 
-* 基于ROS构建双节点架构：
+* Use **unitree_sdk2** instead
+* Use ROS dual-node architecture:
 
-  * **C++节点**：负责机器人与遥控器之间的数据收发
+  * **C++ node**: robot communication + remote control
+  * **Python node**: policy inference
 
-  * **Python节点**：专用于策略推理
+---
 
-### 2. Mimic策略可靠性警告
+### 2. Mimic Policy Reliability Warning
 
-Mimic策略不保证100%成功率，特别是在湿滑/沙地等复杂地面上。若出现机器人失控情况：
+Success rate is **not guaranteed**, especially on slippery/uneven ground.
 
-* 按下 `F1`键激活**阻尼保护模式**(PassiveMode)
+If robot becomes unstable:
 
-* 按下 `Select`键立即终止控制程序
+* Press **F1** to activate **PassiveMode**
+* Press **Select** to immediately stop program
 
-### 3. 查尔斯顿舞蹈(R1+X) - 稳定策略说明
+---
 
-目前唯一在真机上验证稳定的策略：
+### 3. Charleston Dance Stability Notice
 
-⚠️ **重要注意事项**：
+This is currently the **only** behavior confirmed safe and stable **on the real robot**.
 
-* **建议拆除手掌**：原始训练未考虑手掌碰撞（作者的G1初始无手掌）
+⚠️ Important:
 
-* **起止稳定需求**：舞蹈开始/结束时可能需要短暂人工稳定
+* **Remove hand palms** (hands were not included in training dataset → collision risk)
+* **Start/end stability may require brief human support**
+* After dance:
 
-* **舞蹈后过渡**：虽然可以切换至**行走模式/位控模式/阻尼模式**，但建议：
+  * Prefer switching first to **position** or **damping** protection modes
+  * Provide **manual stabilization** during transitions
 
-  * 先切换至**位控模式**或**阻尼模式**
+---
 
-  * 过渡期间需提供人工稳定
+### 4. Other Actions
 
-### 4. 其他动作建议
+All other advanced motions are **NOT recommended** for real-world deployment yet.
 
-其他所有动作目前均**不建议**在真机上部署。
+---
 
-### 5. 强烈建议
+### 5. Strong Recommendation
 
-**务必**先在仿真环境中熟练操作，再尝试真机部署。
+✅ Practice thoroughly in simulation **before any real-robot execution**
+
+
